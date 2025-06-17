@@ -2,7 +2,12 @@ import mongoose from "mongoose";
 
 export async function connect() {
     try {
-        mongoose.connect(process.env.MONGO_URI!);
+        mongoose.set('strictQuery', false);
+
+        if (!process.env.MONGODB_URI) {
+            throw Error("MongoDB URI is not defined in environment variables");
+        }
+        await mongoose.connect(process.env.MONGODB_URI);
         const connection = mongoose.connection;
 
         connection.on('connected', () => {
@@ -16,6 +21,6 @@ export async function connect() {
     } catch (error) {
         console.log("Error connecting to MongoDB");
         console.log(error);
-        throw new Error("Connection failed!");
+        throw Error("Connection failed!");
     }
 };

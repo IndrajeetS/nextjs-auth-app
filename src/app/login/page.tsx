@@ -1,19 +1,36 @@
 'use client'
+import axios from 'axios'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import toast from "react-hot-toast"
 
 
 
 export default function LoginPage() {
+    const router = useRouter()
+
     const [user, setUser] = useState({
         email: '',
         password: '',
     })
 
 
+    const [isLoading, setIsLoading] = useState(false)
+
     const handleSubmit = async (e: any) => {
-        e.preventDefault()
-        console.log(user)
+        try {
+            setIsLoading(true)
+            const response = await axios.post('/api/users/login', user)
+            console.log('Login successful', response.data)
+            toast.success('Login successful')
+            router.push('/profile')
+        } catch (error) {
+            console.log(error)
+            toast.error('Error while Login. Please try again.')
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (
@@ -61,7 +78,7 @@ export default function LoginPage() {
                     className="w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-md 
                    font-semibold text-lg transition mb-3"
                 >
-                    Login
+                    {isLoading ? "Logging in" : "Login"}
                 </button>
                 <Link
                     href="/signup"

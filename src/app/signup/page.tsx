@@ -1,24 +1,42 @@
 'use client'
+import axios from 'axios'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import toast, { Toaster } from "react-hot-toast"
 
 
 
 export default function SignupPage() {
+    const router = useRouter()
+
     const [user, setUser] = useState({
         email: '',
         password: '',
         username: '',
     })
 
+    const [isLoading, setIsLoading] = useState(false)
+
 
     const handleSubmit = async (e: any) => {
-        e.preventDefault()
-        console.log(user)
+        try {
+            setIsLoading(true)
+            const response = await axios.post('/api/users/signup', user)
+            console.log('Signup successful', response.data)
+            toast.success('Signup successful')
+            router.push('/login')
+        } catch (error) {
+            console.log(error)
+            toast.error('Error signing up. Please try again.')
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-pink-50 via-yellow-50 to-purple-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 transition-colors duration-300">
+            <div><Toaster /></div>
             <div className="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-md shadow-lg border border-gray-200 dark:border-gray-700">
                 <h2 className="text-2xl font-bold text-pink-600 dark:text-pink-400 text-center mb-6">
                     🐾 Create Your Account
@@ -78,7 +96,7 @@ export default function SignupPage() {
                     className="w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-md 
                    font-semibold text-lg transition mb-3"
                 >
-                    Sign Up
+                    {isLoading ? "Signing up..." : "Sign Up"}
                 </button>
                 <Link
                     href="/login"
